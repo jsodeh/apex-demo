@@ -1,11 +1,9 @@
-
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Share, Printer, ChevronDown } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
 import {
   Accordion,
   AccordionContent,
@@ -13,6 +11,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import TrackingForm from "@/components/TrackingForm";
+import TrackingTimeline from "@/components/TrackingTimeline";
 import { generateMockTrackingData } from "@/lib/mock-data";
 
 interface TrackingStatus {
@@ -86,16 +85,6 @@ const TrackingPage = () => {
     window.print();
   };
   
-  const getStatusProgressValue = (status: TrackingStatus["status"]) => {
-    switch (status) {
-      case "ordered": return 25;
-      case "processing": return 50;
-      case "intransit": return 75;
-      case "delivered": return 100;
-      default: return 0;
-    }
-  };
-
   const handleTrackAnother = (id: string) => {
     navigate(`/tracking/${id}`);
   };
@@ -151,7 +140,7 @@ const TrackingPage = () => {
         {/* Status Card */}
         <Card className="mb-8">
           <CardContent className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 gap-6">
               <div>
                 <h2 className="text-2xl font-bold mb-2">
                   {trackingInfo.status.label}
@@ -160,21 +149,9 @@ const TrackingPage = () => {
                   {trackingInfo.status.date}
                 </p>
                 
-                <div className="mb-6">
-                  <Progress 
-                    value={getStatusProgressValue(trackingInfo.status.status)} 
-                    className="h-2 bg-gray-200"
-                  />
-                  
-                  <div className="flex justify-between mt-2 text-xs md:text-sm text-gray-500">
-                    <span>Ordered</span>
-                    <span>Processing</span>
-                    <span>In Transit</span>
-                    <span>Delivered</span>
-                  </div>
-                </div>
+                <TrackingTimeline currentStatus={trackingInfo.status.status} />
                 
-                <div className="space-y-2">
+                <div className="mt-6 space-y-2">
                   <div className="flex justify-between">
                     <span className="text-gray-600">Estimated Delivery:</span>
                     <span className="font-medium">{trackingInfo.estimatedDelivery}</span>
@@ -190,7 +167,7 @@ const TrackingPage = () => {
                 </div>
               </div>
               
-              <div className="border-t md:border-t-0 md:border-l pt-4 md:pt-0 md:pl-6">
+              <div className="border-t pt-4">
                 <h3 className="font-semibold mb-4">Delivery Information</h3>
                 <div className="space-y-4">
                   <div>
@@ -214,42 +191,40 @@ const TrackingPage = () => {
         </Card>
         
         {/* Service Information */}
-        <div className="mb-8">
-          <Accordion type="single" collapsible>
-            <AccordionItem value="service-information">
-              <AccordionTrigger className="text-lg font-semibold">
-                Service Information
-              </AccordionTrigger>
-              <AccordionContent>
-                <p className="mb-4">
-                  Access detailed information about your delivery and available services.
-                </p>
-                <div className="space-y-4">
-                  <Button variant="outline" className="w-full justify-start">
-                    <span>What's an expected delivery?</span>
-                    <ChevronDown className="ml-auto h-4 w-4" />
-                  </Button>
-                  <Button variant="outline" className="w-full justify-start">
-                    <span>What's a delivery standard?</span>
-                    <ChevronDown className="ml-auto h-4 w-4" />
-                  </Button>
-                  <Button variant="outline" className="w-full justify-start">
-                    <span>What's a delivery confirmation?</span>
-                    <ChevronDown className="ml-auto h-4 w-4" />
-                  </Button>
-                  <Button variant="outline" className="w-full justify-start">
-                    <span>How do I sign up for text notifications?</span>
-                    <ChevronDown className="ml-auto h-4 w-4" />
-                  </Button>
-                  <Button variant="outline" className="w-full justify-start">
-                    <span>What if my package is missing?</span>
-                    <ChevronDown className="ml-auto h-4 w-4" />
-                  </Button>
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
-        </div>
+        <Accordion type="single" collapsible>
+          <AccordionItem value="service-information">
+            <AccordionTrigger className="text-lg font-semibold">
+              Service Information
+            </AccordionTrigger>
+            <AccordionContent>
+              <p className="mb-4">
+                Access detailed information about your delivery and available services.
+              </p>
+              <div className="space-y-4">
+                <Button variant="outline" className="w-full justify-start">
+                  <span>What's an expected delivery?</span>
+                  <ChevronDown className="ml-auto h-4 w-4" />
+                </Button>
+                <Button variant="outline" className="w-full justify-start">
+                  <span>What's a delivery standard?</span>
+                  <ChevronDown className="ml-auto h-4 w-4" />
+                </Button>
+                <Button variant="outline" className="w-full justify-start">
+                  <span>What's a delivery confirmation?</span>
+                  <ChevronDown className="ml-auto h-4 w-4" />
+                </Button>
+                <Button variant="outline" className="w-full justify-start">
+                  <span>How do I sign up for text notifications?</span>
+                  <ChevronDown className="ml-auto h-4 w-4" />
+                </Button>
+                <Button variant="outline" className="w-full justify-start">
+                  <span>What if my package is missing?</span>
+                  <ChevronDown className="ml-auto h-4 w-4" />
+                </Button>
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
         
         {/* Latest Updates */}
         <div className="mb-8">
