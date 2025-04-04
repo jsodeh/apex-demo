@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Plus, Truck } from "lucide-react";
 
 interface AdminHeaderProps {
   onCreateOrder: () => void;
@@ -13,7 +13,7 @@ const AdminHeader = ({ onCreateOrder }: AdminHeaderProps) => {
         <div>
           <h1 className="text-3xl font-bold">Orders Management</h1>
           <p className="text-muted-foreground mt-1">
-            View and manage all shipment orders
+            View, manage, and update shipment orders
           </p>
         </div>
         <Button onClick={onCreateOrder}>

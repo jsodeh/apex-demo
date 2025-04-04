@@ -12,15 +12,16 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Eye, Package } from "lucide-react";
+import { Search, Eye, Package, RefreshCw } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface OrdersTableProps {
   orders: AdminOrder[];
   onViewOrder: (trackingId: string) => void;
+  onUpdateStatus: (order: AdminOrder) => void;
 }
 
-const OrdersTable = ({ orders, onViewOrder }: OrdersTableProps) => {
+const OrdersTable = ({ orders, onViewOrder, onUpdateStatus }: OrdersTableProps) => {
   const [searchQuery, setSearchQuery] = useState("");
 
   const filteredOrders = orders.filter(order => 
@@ -106,10 +107,16 @@ const OrdersTable = ({ orders, onViewOrder }: OrdersTableProps) => {
                   <TableCell>{order.origin}</TableCell>
                   <TableCell>{order.destination}</TableCell>
                   <TableCell className="text-right">
-                    <Button variant="ghost" size="sm" onClick={() => onViewOrder(order.trackingId)}>
-                      <Eye className="h-4 w-4 mr-2" />
-                      View
-                    </Button>
+                    <div className="flex justify-end gap-2">
+                      <Button variant="outline" size="sm" onClick={() => onUpdateStatus(order)}>
+                        <RefreshCw className="h-4 w-4 mr-2" />
+                        Update
+                      </Button>
+                      <Button variant="ghost" size="sm" onClick={() => onViewOrder(order.trackingId)}>
+                        <Eye className="h-4 w-4 mr-2" />
+                        View
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))

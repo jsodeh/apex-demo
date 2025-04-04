@@ -1,5 +1,5 @@
 
-import { TrackingInfo } from "./tracking";
+import { TrackingInfo, TimelineStatus } from "./tracking";
 
 export interface AdminOrder {
   id: string;
@@ -16,4 +16,10 @@ export interface CreateOrderFormData {
   origin: string;
   destination: string;
   service: string;
+}
+
+export interface UpdateStatusFormData {
+  status: TimelineStatus;
+  location: string;
+  description: string;
 }
