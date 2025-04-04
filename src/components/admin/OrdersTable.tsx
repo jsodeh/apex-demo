@@ -17,7 +17,7 @@ import { cn } from "@/lib/utils";
 
 interface OrdersTableProps {
   orders: AdminOrder[];
-  onViewOrder: (trackingId: string) => void;
+  onViewOrder: (order: AdminOrder) => void;
   onUpdateStatus: (order: AdminOrder) => void;
 }
 
@@ -112,7 +112,7 @@ const OrdersTable = ({ orders, onViewOrder, onUpdateStatus }: OrdersTableProps) 
                         <RefreshCw className="h-4 w-4 mr-2" />
                         Update
                       </Button>
-                      <Button variant="ghost" size="sm" onClick={() => onViewOrder(order.trackingId)}>
+                      <Button variant="ghost" size="sm" onClick={() => onViewOrder(order)}>
                         <Eye className="h-4 w-4 mr-2" />
                         View
                       </Button>

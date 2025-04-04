@@ -1,11 +1,11 @@
 
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { AdminOrder, UpdateStatusFormData } from "@/types/admin";
 import AdminHeader from "@/components/admin/AdminHeader";
 import OrdersTable from "@/components/admin/OrdersTable";
 import CreateOrderDialog from "@/components/admin/CreateOrderDialog";
 import UpdateStatusDialog from "@/components/admin/UpdateStatusDialog";
+import ViewOrderDialog from "@/components/admin/ViewOrderDialog";
 import { useToast } from "@/hooks/use-toast";
 import { 
   getStoredOrders, 
@@ -18,8 +18,8 @@ const AdminPage = () => {
   const [orders, setOrders] = useState<AdminOrder[]>([]);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isUpdateStatusDialogOpen, setIsUpdateStatusDialogOpen] = useState(false);
+  const [isViewOrderDialogOpen, setIsViewOrderDialogOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<AdminOrder | null>(null);
-  const navigate = useNavigate();
   const { toast } = useToast();
 
   // Initialize data and load orders from localStorage
@@ -32,8 +32,9 @@ const AdminPage = () => {
     setOrders(storedOrders);
   }, []);
 
-  const handleViewOrder = (trackingId: string) => {
-    navigate(`/tracking/${trackingId}`);
+  const handleViewOrder = (order: AdminOrder) => {
+    setSelectedOrder(order);
+    setIsViewOrderDialogOpen(true);
   };
 
   const handleCreateOrder = (newOrder: AdminOrder) => {
@@ -86,6 +87,14 @@ const AdminPage = () => {
           setSelectedOrder(null);
         }}
         onUpdateStatus={handleUpdateStatus}
+      />
+      <ViewOrderDialog
+        order={selectedOrder}
+        open={isViewOrderDialogOpen}
+        onClose={() => {
+          setIsViewOrderDialogOpen(false);
+          setSelectedOrder(null);
+        }}
       />
     </div>
   );
