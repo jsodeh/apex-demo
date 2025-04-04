@@ -1,4 +1,5 @@
 
+import React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -13,22 +14,24 @@ import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
+  <React.StrictMode>
+    <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Layout />}>
-            <Route index element={<HomePage />} />
-            <Route path="/tracking/:trackingId" element={<TrackingPage />} />
-            <Route path="/admin" element={<AdminPage />} />
-            <Route path="*" element={<NotFound />} />
-          </Route>
-        </Routes>
+        <TooltipProvider>
+          <Routes>
+            <Route path="/" element={<Layout />}>
+              <Route index element={<HomePage />} />
+              <Route path="/tracking/:trackingId" element={<TrackingPage />} />
+              <Route path="/admin" element={<AdminPage />} />
+              <Route path="*" element={<NotFound />} />
+            </Route>
+          </Routes>
+          <Toaster />
+          <Sonner />
+        </TooltipProvider>
       </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
+    </QueryClientProvider>
+  </React.StrictMode>
 );
 
 export default App;
