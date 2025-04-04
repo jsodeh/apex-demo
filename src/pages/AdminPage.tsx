@@ -1,6 +1,5 @@
 
-import { useState } from "react";
-import { generateMockOrders } from "@/lib/mock-admin";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { AdminOrder, UpdateStatusFormData } from "@/types/admin";
 import AdminHeader from "@/components/admin/AdminHeader";
@@ -8,22 +7,40 @@ import OrdersTable from "@/components/admin/OrdersTable";
 import CreateOrderDialog from "@/components/admin/CreateOrderDialog";
 import UpdateStatusDialog from "@/components/admin/UpdateStatusDialog";
 import { useToast } from "@/hooks/use-toast";
-import { generateMockTrackingData } from "@/lib/mock-data";
+import { 
+  getStoredOrders, 
+  addOrder, 
+  updateOrder, 
+  initializeLocalStorage 
+} from "@/lib/local-storage";
 
 const AdminPage = () => {
-  const [orders, setOrders] = useState<AdminOrder[]>(generateMockOrders());
+  const [orders, setOrders] = useState<AdminOrder[]>([]);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isUpdateStatusDialogOpen, setIsUpdateStatusDialogOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<AdminOrder | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  // Initialize data and load orders from localStorage
+  useEffect(() => {
+    // Initialize localStorage with sample data if empty
+    initializeLocalStorage();
+    
+    // Load orders from localStorage
+    const storedOrders = getStoredOrders();
+    setOrders(storedOrders);
+  }, []);
+
   const handleViewOrder = (trackingId: string) => {
     navigate(`/tracking/${trackingId}`);
   };
 
   const handleCreateOrder = (newOrder: AdminOrder) => {
-    setOrders([newOrder, ...orders]);
+    // Add order to localStorage and update state
+    const updatedOrders = addOrder(newOrder);
+    setOrders(updatedOrders);
+    
     toast({
       title: "Order created successfully",
       description: `Tracking ID: ${newOrder.trackingId}`,
@@ -37,13 +54,8 @@ const AdminPage = () => {
   };
 
   const handleUpdateStatus = (trackingId: string, data: UpdateStatusFormData) => {
-    // Update the order status in the orders list
-    const updatedOrders = orders.map(order => 
-      order.trackingId === trackingId 
-        ? { ...order, status: data.status }
-        : order
-    );
-    
+    // Update the order status in localStorage
+    const updatedOrders = updateOrder(trackingId, { status: data.status });
     setOrders(updatedOrders);
     
     // Show success toast with information
