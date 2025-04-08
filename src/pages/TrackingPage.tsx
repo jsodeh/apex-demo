@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { TrackingInfo } from "@/types/tracking";
@@ -12,6 +11,7 @@ import TrackingEvents from "@/components/tracking/TrackingEvents";
 import TrackAnotherPackage from "@/components/tracking/TrackAnotherPackage";
 import LoadingState from "@/components/tracking/LoadingState";
 import NotFoundState from "@/components/tracking/NotFoundState";
+import { toast } from "sonner";
 
 const TrackingPage = () => {
   const { trackingId } = useParams<{ trackingId: string }>();
@@ -26,13 +26,17 @@ const TrackingPage = () => {
     setIsLoading(true);
     // Get data from localStorage
     const orders = getStoredOrders();
+    console.log(`Searching for tracking ID: ${trackingId}`);
+    console.log(`Available orders:`, orders.map(o => o.trackingId));
     const order = orders.find(o => o.trackingId === trackingId);
     
     if (order) {
       // Convert admin order to tracking info format
       const data = convertOrderToTrackingInfo(order);
       setTrackingInfo(data);
+      console.log("Found tracking information:", data);
     } else {
+      console.log(`No order found with tracking ID: ${trackingId}`);
       setTrackingInfo(null);
     }
     setIsLoading(false);
@@ -55,7 +59,14 @@ const TrackingPage = () => {
   }, [trackingId, navigate]);
   
   const handleTrackAnother = (id: string) => {
-    navigate(`/tracking/${id}`);
+    if (id === trackingId) {
+      // If trying to track the same ID, refresh the data
+      toast.info("Refreshing tracking information");
+      fetchTrackingData();
+    } else {
+      // Otherwise navigate to the new tracking page
+      navigate(`/tracking/${id}`);
+    }
   };
 
   if (isLoading) {

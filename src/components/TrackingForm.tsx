@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -12,10 +12,20 @@ interface TrackingFormProps {
 
 const TrackingForm = ({ onSubmit, defaultValue = "" }: TrackingFormProps) => {
   const [trackingId, setTrackingId] = useState(defaultValue);
+  
+  // Update tracking ID when defaultValue changes
+  useEffect(() => {
+    if (defaultValue) {
+      setTrackingId(defaultValue);
+    }
+  }, [defaultValue]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(trackingId);
+    
+    if (trackingId.trim()) {
+      onSubmit(trackingId.trim());
+    }
   };
 
   return (
@@ -34,7 +44,7 @@ const TrackingForm = ({ onSubmit, defaultValue = "" }: TrackingFormProps) => {
             className="flex-1"
             autoComplete="off"
           />
-          <Button type="submit">
+          <Button type="submit" className="bg-primary hover:bg-primary/90">
             <Search className="h-4 w-4 mr-2" />
             Track
           </Button>
