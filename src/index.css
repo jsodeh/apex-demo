@@ -23,7 +23,7 @@
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
 
-    --accent: 210 100% 25%;
+    --accent: 0 0% 6.7%;
     --accent-foreground: 222.2 47.4% 11.2%;
 
     --destructive: 0 84.2% 60.2%;
@@ -73,7 +73,7 @@
   }
 
   body {
-    @apply bg-white text-foreground;
+    @apply bg-black text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 
@@ -83,7 +83,16 @@
 }
 
 .hero-pattern {
-  background-color: #ffffff;
-  background-image: radial-gradient(#e0e0e0 0.5px, #ffffff 0.5px);
+  background-color: #111111;
+  background-image: radial-gradient(#222222 0.5px, #111111 0.5px);
   background-size: 10px 10px;
+}
+
+.security-gradient {
+  background: linear-gradient(135deg, rgba(0, 82, 180, 0.95) 0%, rgba(0, 56, 120, 0.95) 100%);
+}
+
+.vault-glow {
+  box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
+  border: 1px solid rgba(212, 175, 55, 0.3);
 }

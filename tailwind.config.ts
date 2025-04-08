@@ -54,9 +54,10 @@ export default {
 					foreground: 'hsl(var(--card-foreground))'
 				},
 				apex: {
-					DEFAULT: '#0052B4',
-					secondary: '#D80027',
-					accent: '#003878',
+					DEFAULT: '#0052B4', // Blue
+					secondary: '#D80027', // Red
+					accent: '#111111', // Black
+					gold: '#D4AF37', // Gold accent
 					gray: '#f8f8f8',
 					dark: '#222222',
 					light: '#ffffff'
@@ -92,6 +93,10 @@ export default {
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out'
+			},
+			backgroundImage: {
+				'vault-pattern': "url('/lovable-uploads/d884c24d-321d-45bd-8480-e48b17ba2473.png')",
+				'vault-door': "url('/lovable-uploads/403bc344-a8be-4d0a-85e2-39f9de805d36.png')",
 			}
 		}
 	},
