@@ -109,9 +109,7 @@ const HomePage = () => {
             <p className="text-lg mb-8">
               Join thousands of satisfied customers who trust us with their global logistics needs.
             </p>
-            <Button size="lg" variant="outline" className="bg-white hover:bg-gray-100 text-apex-DEFAULT">
-              Get Started Today
-            </Button>
+            {/* Removed the "Get Started Today" button here */}
           </div>
         </div>
       </section>

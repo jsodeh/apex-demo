@@ -64,7 +64,7 @@ const TrackingTimeline = ({ currentStatus }: TrackingTimelineProps) => {
             <TimelineItem
               label={step.label}
               active={index === currentStatusIndex}
-              completed={index < currentStatusIndex}
+              completed={index < currentStatusIndex || step.id === currentStatus && step.id === "delivered"}
               isLast={index === steps.length - 1}
             />
           </div>
