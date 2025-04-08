@@ -1,8 +1,9 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { generateMockTrackingData } from "@/lib/mock-data";
 import { TrackingInfo } from "@/types/tracking";
+import { getStoredOrders } from "@/lib/local-storage";
+import { convertOrderToTrackingInfo } from "@/lib/tracking-utils";
 
 import TrackingHeader from "@/components/tracking/TrackingHeader";
 import ShipmentStatusCard from "@/components/tracking/ShipmentStatusCard";
@@ -27,10 +28,17 @@ const TrackingPage = () => {
     // Simulate API call to fetch tracking data
     setIsLoading(true);
     setTimeout(() => {
-      const data = generateMockTrackingData(trackingId);
-      setTrackingInfo(data);
+      // Get data from localStorage instead of mock data
+      const orders = getStoredOrders();
+      const order = orders.find(o => o.trackingId === trackingId);
+      
+      if (order) {
+        // Convert admin order to tracking info format
+        const data = convertOrderToTrackingInfo(order);
+        setTrackingInfo(data);
+      }
       setIsLoading(false);
-    }, 1000);
+    }, 500);
   }, [trackingId, navigate]);
   
   const handleTrackAnother = (id: string) => {

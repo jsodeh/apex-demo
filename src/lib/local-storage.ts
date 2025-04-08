@@ -4,6 +4,7 @@ import { AdminOrder } from "@/types/admin";
 // Local storage keys
 const ORDERS_STORAGE_KEY = "apex_orders";
 const USERS_STORAGE_KEY = "apex_users";
+const ADMIN_CREDENTIALS_KEY = "apex_admin_credentials";
 
 // Type for user details
 export interface UserDetails {
@@ -12,6 +13,14 @@ export interface UserDetails {
   email: string;
   role: "admin" | "user";
   createdAt: string;
+}
+
+// Type for admin credentials
+export interface AdminCredential {
+  username: string;
+  password: string;
+  name: string;
+  email: string;
 }
 
 // Get all orders from localStorage
@@ -78,6 +87,25 @@ export const addUser = (newUser: UserDetails): UserDetails[] => {
   return updatedUsers;
 };
 
+// Admin credentials functions
+export const getAdminCredentials = (): AdminCredential | null => {
+  try {
+    const credentialsJson = localStorage.getItem(ADMIN_CREDENTIALS_KEY);
+    return credentialsJson ? JSON.parse(credentialsJson) : null;
+  } catch (error) {
+    console.error("Error loading admin credentials from localStorage:", error);
+    return null;
+  }
+};
+
+export const saveAdminCredentials = (credentials: AdminCredential): void => {
+  try {
+    localStorage.setItem(ADMIN_CREDENTIALS_KEY, JSON.stringify(credentials));
+  } catch (error) {
+    console.error("Error saving admin credentials to localStorage:", error);
+  }
+};
+
 // Initialize with default data if storage is empty
 export const initializeLocalStorage = (): void => {
   // Check if orders exist, if not create sample data
@@ -113,5 +141,18 @@ export const initializeLocalStorage = (): void => {
     ];
     saveUsers(defaultUsers);
     console.log("Initialized sample user data in localStorage");
+  }
+  
+  // Check if admin credentials exist, if not create them
+  const existingCredentials = getAdminCredentials();
+  if (!existingCredentials) {
+    const adminCredentials: AdminCredential = {
+      username: "admin",
+      password: "apex2025",
+      name: "Admin User",
+      email: "admin@apexshipping.com"
+    };
+    saveAdminCredentials(adminCredentials);
+    console.log("Initialized admin credentials in localStorage");
   }
 };

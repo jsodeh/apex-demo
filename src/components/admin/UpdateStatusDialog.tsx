@@ -69,6 +69,17 @@ const UpdateStatusDialog = ({
     },
   });
 
+  // Reset form when order changes
+  React.useEffect(() => {
+    if (order) {
+      form.reset({
+        status: (order.status as TimelineStatus) || "processing",
+        location: "",
+        description: "",
+      });
+    }
+  }, [order, form]);
+
   const onSubmit = (data: UpdateStatusFormData) => {
     if (!order) return;
     
@@ -109,6 +120,7 @@ const UpdateStatusDialog = ({
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}
+                    value={field.value}
                   >
                     <FormControl>
                       <SelectTrigger>

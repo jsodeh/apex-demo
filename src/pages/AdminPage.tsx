@@ -11,7 +11,8 @@ import {
   getStoredOrders, 
   addOrder, 
   updateOrder, 
-  initializeLocalStorage 
+  initializeLocalStorage,
+  getAdminCredentials 
 } from "@/lib/local-storage";
 
 const AdminPage = () => {
@@ -21,6 +22,7 @@ const AdminPage = () => {
   const [isViewOrderDialogOpen, setIsViewOrderDialogOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<AdminOrder | null>(null);
   const { toast } = useToast();
+  const [adminCredentials, setAdminCredentials] = useState<any>(null);
 
   // Initialize data and load orders from localStorage
   useEffect(() => {
@@ -30,6 +32,18 @@ const AdminPage = () => {
     // Load orders from localStorage
     const storedOrders = getStoredOrders();
     setOrders(storedOrders);
+    
+    // Load admin credentials for display
+    const credentials = getAdminCredentials();
+    setAdminCredentials(credentials);
+    
+    // Log admin credentials to console for easy access
+    if (credentials) {
+      console.log("Admin credentials:", {
+        username: credentials.username,
+        password: credentials.password
+      });
+    }
   }, []);
 
   const handleViewOrder = (order: AdminOrder) => {
@@ -69,16 +83,29 @@ const AdminPage = () => {
   return (
     <div className="container py-8">
       <AdminHeader onCreateOrder={() => setIsCreateDialogOpen(true)} />
+      
+      {adminCredentials && (
+        <div className="bg-amber-50 border border-amber-200 rounded-md p-4 mb-6">
+          <h3 className="text-amber-800 font-medium mb-2">Admin Credentials</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-amber-700">
+            <div><span className="font-semibold">Username:</span> {adminCredentials.username}</div>
+            <div><span className="font-semibold">Password:</span> {adminCredentials.password}</div>
+          </div>
+        </div>
+      )}
+      
       <OrdersTable 
         orders={orders} 
         onViewOrder={handleViewOrder}
         onUpdateStatus={handleUpdateStatusClick}
       />
+      
       <CreateOrderDialog 
         open={isCreateDialogOpen} 
         onClose={() => setIsCreateDialogOpen(false)}
         onCreateOrder={handleCreateOrder}
       />
+      
       <UpdateStatusDialog
         order={selectedOrder}
         open={isUpdateStatusDialogOpen}
@@ -88,6 +115,7 @@ const AdminPage = () => {
         }}
         onUpdateStatus={handleUpdateStatus}
       />
+      
       <ViewOrderDialog
         order={selectedOrder}
         open={isViewOrderDialogOpen}

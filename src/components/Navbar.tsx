@@ -23,16 +23,7 @@ const Navbar = () => {
         {/* Desktop navigation */}
         <nav className="hidden md:flex items-center space-x-6">
           <Link to="/" className="text-sm font-medium transition-colors hover:text-apex-DEFAULT">
-            Home
-          </Link>
-          <Link to="/services" className="text-sm font-medium transition-colors hover:text-apex-DEFAULT">
-            Services
-          </Link>
-          <Link to="/about" className="text-sm font-medium transition-colors hover:text-apex-DEFAULT">
-            About Us
-          </Link>
-          <Link to="/contact" className="text-sm font-medium transition-colors hover:text-apex-DEFAULT">
-            Contact
+            Track
           </Link>
           <div className="relative w-40">
             <Search className="absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -70,28 +61,7 @@ const Navbar = () => {
               className="block py-2 text-sm font-medium"
               onClick={() => setIsOpen(false)}
             >
-              Home
-            </Link>
-            <Link 
-              to="/services" 
-              className="block py-2 text-sm font-medium"
-              onClick={() => setIsOpen(false)}
-            >
-              Services
-            </Link>
-            <Link 
-              to="/about" 
-              className="block py-2 text-sm font-medium"
-              onClick={() => setIsOpen(false)}
-            >
-              About Us
-            </Link>
-            <Link 
-              to="/contact" 
-              className="block py-2 text-sm font-medium"
-              onClick={() => setIsOpen(false)}
-            >
-              Contact
+              Track
             </Link>
             <div className="relative">
               <Search className="absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
