@@ -1,10 +1,11 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { AdminOrder, UpdateStatusFormData } from "@/types/admin";
 import { TimelineStatus } from "@/types/tracking";
+import { toast } from "sonner";
 
 import {
   Dialog,
@@ -70,28 +71,40 @@ const UpdateStatusDialog = ({
   });
 
   // Reset form when order changes
-  React.useEffect(() => {
+  useEffect(() => {
     if (order) {
       form.reset({
         status: (order.status as TimelineStatus) || "processing",
-        location: "",
+        location: order.destination || "",
         description: "",
       });
     }
   }, [order, form]);
 
   const onSubmit = (data: UpdateStatusFormData) => {
-    if (!order) return;
+    if (!order) {
+      toast.error("No order selected");
+      return;
+    }
     
     setIsSubmitting(true);
     
-    // Simulate API call delay
-    setTimeout(() => {
+    try {
       onUpdateStatus(order.trackingId, data);
-      setIsSubmitting(false);
+      
+      toast.success("Status updated successfully", {
+        description: `${order.trackingId} is now ${data.status}`,
+      });
+      
       form.reset();
       onClose();
-    }, 500);
+    } catch (error) {
+      toast.error("Failed to update status", {
+        description: "Please try again",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (!order) return null;
@@ -181,7 +194,7 @@ const UpdateStatusDialog = ({
                 className="gap-2"
               >
                 <SendHorizontal className="h-4 w-4" />
-                Send Update
+                {isSubmitting ? "Updating..." : "Send Update"}
               </Button>
             </DialogFooter>
           </form>

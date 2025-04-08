@@ -10,6 +10,7 @@ import HomePage from "./pages/HomePage";
 import TrackingPage from "./pages/TrackingPage";
 import AdminPage from "./pages/AdminPage";
 import NotFound from "./pages/NotFound";
+import AdminGuard from "@/components/auth/AdminGuard";
 
 const queryClient = new QueryClient();
 
@@ -22,7 +23,12 @@ const App = () => (
             <Route path="/" element={<Layout />}>
               <Route index element={<HomePage />} />
               <Route path="/tracking/:trackingId" element={<TrackingPage />} />
-              <Route path="/admin" element={<AdminPage />} />
+              
+              {/* Protected admin routes */}
+              <Route element={<AdminGuard />}>
+                <Route path="/admin" element={<AdminPage />} />
+              </Route>
+              
               <Route path="*" element={<NotFound />} />
             </Route>
           </Routes>

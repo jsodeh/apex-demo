@@ -19,26 +19,39 @@ const TrackingPage = () => {
   const [trackingInfo, setTrackingInfo] = useState<TrackingInfo | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   
+  // Function to fetch the latest tracking data
+  const fetchTrackingData = () => {
+    if (!trackingId) return;
+    
+    setIsLoading(true);
+    // Get data from localStorage
+    const orders = getStoredOrders();
+    const order = orders.find(o => o.trackingId === trackingId);
+    
+    if (order) {
+      // Convert admin order to tracking info format
+      const data = convertOrderToTrackingInfo(order);
+      setTrackingInfo(data);
+    } else {
+      setTrackingInfo(null);
+    }
+    setIsLoading(false);
+  };
+  
   useEffect(() => {
     if (!trackingId) {
       navigate("/");
       return;
     }
     
-    // Simulate API call to fetch tracking data
-    setIsLoading(true);
-    setTimeout(() => {
-      // Get data from localStorage instead of mock data
-      const orders = getStoredOrders();
-      const order = orders.find(o => o.trackingId === trackingId);
-      
-      if (order) {
-        // Convert admin order to tracking info format
-        const data = convertOrderToTrackingInfo(order);
-        setTrackingInfo(data);
-      }
-      setIsLoading(false);
-    }, 500);
+    // Initial fetch
+    fetchTrackingData();
+    
+    // Set up polling to check for updates every 10 seconds
+    const intervalId = setInterval(fetchTrackingData, 10000);
+    
+    // Clean up interval on unmount
+    return () => clearInterval(intervalId);
   }, [trackingId, navigate]);
   
   const handleTrackAnother = (id: string) => {

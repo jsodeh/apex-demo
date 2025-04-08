@@ -1,12 +1,31 @@
 
 import { useState } from "react";
-import { Link } from "react-router-dom";
-import { Menu, X, Search } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { Menu, X, Search, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import LoginDialog from "@/components/auth/LoginDialog";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [loginDialogOpen, setLoginDialogOpen] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
+  const navigate = useNavigate();
+  
+  const isAdminLoggedIn = localStorage.getItem("admin_logged_in") === "true";
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchValue.trim()) {
+      navigate(`/tracking/${searchValue.trim()}`);
+      setSearchValue("");
+    }
+  };
+  
+  const handleLogout = () => {
+    localStorage.removeItem("admin_logged_in");
+    navigate("/");
+  };
 
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -25,17 +44,30 @@ const Navbar = () => {
           <Link to="/" className="text-sm font-medium transition-colors hover:text-apex-DEFAULT">
             Track
           </Link>
-          <div className="relative w-40">
+          <form onSubmit={handleSearch} className="relative w-40">
             <Search className="absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input 
               type="search"
               placeholder="Search..."
               className="w-full pl-8 rounded-md"
+              value={searchValue}
+              onChange={(e) => setSearchValue(e.target.value)}
             />
-          </div>
-          <Button variant="default" asChild>
-            <Link to="/login">Login</Link>
-          </Button>
+          </form>
+          {isAdminLoggedIn ? (
+            <div className="flex items-center space-x-2">
+              <Button variant="outline" asChild>
+                <Link to="/admin">Admin Dashboard</Link>
+              </Button>
+              <Button variant="ghost" size="icon" onClick={handleLogout}>
+                <LogOut className="h-4 w-4" />
+              </Button>
+            </div>
+          ) : (
+            <Button variant="default" onClick={() => setLoginDialogOpen(true)}>
+              Login
+            </Button>
+          )}
         </nav>
 
         {/* Mobile menu button */}
@@ -63,20 +95,50 @@ const Navbar = () => {
             >
               Track
             </Link>
-            <div className="relative">
+            <form onSubmit={handleSearch} className="relative">
               <Search className="absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input 
                 type="search"
                 placeholder="Search..."
                 className="w-full pl-8"
+                value={searchValue}
+                onChange={(e) => setSearchValue(e.target.value)}
               />
-            </div>
-            <Button variant="default" className="w-full" asChild>
-              <Link to="/login" onClick={() => setIsOpen(false)}>Login</Link>
-            </Button>
+            </form>
+            {isAdminLoggedIn ? (
+              <div className="space-y-2">
+                <Button variant="outline" className="w-full" asChild>
+                  <Link to="/admin" onClick={() => setIsOpen(false)}>Admin Dashboard</Link>
+                </Button>
+                <Button variant="ghost" className="w-full" onClick={() => {
+                  handleLogout();
+                  setIsOpen(false);
+                }}>
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Logout
+                </Button>
+              </div>
+            ) : (
+              <Button 
+                variant="default" 
+                className="w-full" 
+                onClick={() => {
+                  setLoginDialogOpen(true);
+                  setIsOpen(false);
+                }}
+              >
+                Login
+              </Button>
+            )}
           </div>
         </div>
       )}
+      
+      {/* Login Dialog */}
+      <LoginDialog 
+        open={loginDialogOpen} 
+        onClose={() => setLoginDialogOpen(false)} 
+      />
     </header>
   );
 };
