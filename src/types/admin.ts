@@ -9,6 +9,8 @@ export interface AdminOrder {
   status: string;
   origin: string;
   destination: string;
+  recipientName?: string;
+  recipientAddress?: string;
 }
 
 export interface CreateOrderFormData {
