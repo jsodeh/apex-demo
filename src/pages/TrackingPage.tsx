@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { TrackingInfo } from "@/types/tracking";
@@ -26,9 +27,17 @@ const TrackingPage = () => {
     setIsLoading(true);
     // Get data from localStorage
     const orders = getStoredOrders();
-    console.log(`Searching for tracking ID: ${trackingId}`);
+    
+    // Normalize the trackingId for comparison (trim and convert to uppercase)
+    const normalizedTrackingId = trackingId.trim().toUpperCase();
+    
+    console.log(`Searching for tracking ID: ${normalizedTrackingId}`);
     console.log(`Available orders:`, orders.map(o => o.trackingId));
-    const order = orders.find(o => o.trackingId === trackingId);
+    
+    // Find the order with matching tracking ID (case-insensitive)
+    const order = orders.find(o => 
+      o.trackingId.trim().toUpperCase() === normalizedTrackingId
+    );
     
     if (order) {
       // Convert admin order to tracking info format
@@ -36,7 +45,7 @@ const TrackingPage = () => {
       setTrackingInfo(data);
       console.log("Found tracking information:", data);
     } else {
-      console.log(`No order found with tracking ID: ${trackingId}`);
+      console.log(`No order found with tracking ID: ${normalizedTrackingId}`);
       setTrackingInfo(null);
     }
     setIsLoading(false);
@@ -59,7 +68,8 @@ const TrackingPage = () => {
   }, [trackingId, navigate]);
   
   const handleTrackAnother = (id: string) => {
-    if (id === trackingId) {
+    // Normalize tracking IDs for comparison
+    if (id.trim().toUpperCase() === trackingId?.trim().toUpperCase()) {
       // If trying to track the same ID, refresh the data
       toast.info("Refreshing tracking information");
       fetchTrackingData();
