@@ -6,6 +6,8 @@ import * as z from "zod";
 import { AdminOrder, UpdateStatusFormData } from "@/types/admin";
 import { TimelineStatus } from "@/types/tracking";
 import { toast } from "sonner";
+import { format } from "date-fns";
+import { CalendarIcon } from "lucide-react";
 
 import {
   Dialog,
@@ -32,10 +34,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Package, SendHorizontal } from "lucide-react";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { Package, SendHorizontal, Calendar as CalendarIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Textarea } from "@/components/ui/textarea";
 
 const formSchema = z.object({
-  status: z.enum(["ordered", "processing", "intransit", "delivered"], {
+  status: z.enum(["ordered", "processing", "intransit", "delivered", "onhold"], {
     required_error: "Please select a status",
   }),
   location: z.string().min(2, {
@@ -44,6 +54,8 @@ const formSchema = z.object({
   description: z.string().min(5, {
     message: "Description must be at least 5 characters",
   }),
+  onHoldReason: z.string().optional(),
+  shipmentDate: z.date().optional(),
 });
 
 interface UpdateStatusDialogProps {
@@ -67,8 +79,13 @@ const UpdateStatusDialog = ({
       status: (order?.status as TimelineStatus) || "processing",
       location: "",
       description: "",
+      onHoldReason: "",
+      shipmentDate: order?.shipmentDate ? new Date(order.shipmentDate) : undefined,
     },
   });
+
+  const watchStatus = form.watch("status");
+  const isOnHold = watchStatus === "onhold";
 
   // Reset form when order changes
   useEffect(() => {
@@ -77,6 +94,8 @@ const UpdateStatusDialog = ({
         status: (order.status as TimelineStatus) || "processing",
         location: order.destination || "",
         description: "",
+        onHoldReason: order.onHoldReason || "",
+        shipmentDate: order.shipmentDate ? new Date(order.shipmentDate) : undefined,
       });
     }
   }, [order, form]);
@@ -145,8 +164,69 @@ const UpdateStatusDialog = ({
                       <SelectItem value="processing">Processing</SelectItem>
                       <SelectItem value="intransit">In Transit</SelectItem>
                       <SelectItem value="delivered">Delivered</SelectItem>
+                      <SelectItem value="onhold">On Hold</SelectItem>
                     </SelectContent>
                   </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            {isOnHold && (
+              <FormField
+                control={form.control}
+                name="onHoldReason"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>On Hold Reason</FormLabel>
+                    <FormControl>
+                      <Textarea 
+                        placeholder="Explain why the shipment is on hold..." 
+                        className="resize-none"
+                        {...field} 
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+            
+            <FormField
+              control={form.control}
+              name="shipmentDate"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel>Shipment Date</FormLabel>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant={"outline"}
+                          className={cn(
+                            "w-full pl-3 text-left font-normal",
+                            !field.value && "text-muted-foreground"
+                          )}
+                        >
+                          {field.value ? (
+                            format(field.value, "PPP")
+                          ) : (
+                            <span>Pick a date</span>
+                          )}
+                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={field.value}
+                        onSelect={field.onChange}
+                        initialFocus
+                        className={cn("p-3 pointer-events-auto")}
+                      />
+                    </PopoverContent>
+                  </Popover>
                   <FormMessage />
                 </FormItem>
               )}

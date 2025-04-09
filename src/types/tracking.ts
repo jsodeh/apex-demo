@@ -1,5 +1,5 @@
 
-export type TimelineStatus = "ordered" | "processing" | "intransit" | "delivered";
+export type TimelineStatus = "ordered" | "processing" | "intransit" | "delivered" | "onhold";
 
 export interface TrackingStatus {
   status: TimelineStatus;
@@ -34,4 +34,6 @@ export interface TrackingInfo {
   service: string;
   recipient?: Recipient;
   shipmentDate?: string;
+  onHold?: boolean;
+  onHoldReason?: string;
 }

@@ -11,6 +11,9 @@ export interface AdminOrder {
   destination: string;
   recipientName?: string;
   recipientAddress?: string;
+  shipmentDate?: string;
+  onHold?: boolean;
+  onHoldReason?: string;
 }
 
 export interface CreateOrderFormData {
@@ -24,4 +27,6 @@ export interface UpdateStatusFormData {
   status: TimelineStatus;
   location: string;
   description: string;
+  onHoldReason?: string;
+  shipmentDate?: string;
 }

@@ -10,6 +10,7 @@ export const formatStatus = (status: string): string => {
     case "processing": return "Processing at Facility";
     case "intransit": return "In Transit";
     case "delivered": return "Delivered";
+    case "onhold": return "On Hold";
     default: return status;
   }
 };
@@ -32,7 +33,7 @@ export const generateEventsFromStatus = (order: AdminOrder): TrackingEvent[] => 
   });
   
   // Add processing event
-  if (["processing", "intransit", "delivered"].includes(order.status)) {
+  if (["processing", "intransit", "delivered", "onhold"].includes(order.status)) {
     const processingDate = sub(today, { days: order.status === "delivered" ? 3 : order.status === "intransit" ? 2 : 1 });
     events.push({
       date: format(processingDate, "MMMM d"),
@@ -52,6 +53,17 @@ export const generateEventsFromStatus = (order: AdminOrder): TrackingEvent[] => 
       location: "In Transit",
       description: "Package in transit to destination",
       status: "intransit"
+    });
+  }
+  
+  // Add on hold event
+  if (order.status === "onhold") {
+    events.push({
+      date: format(today, "MMMM d"),
+      time: format(today, "h:mm a"),
+      location: order.onHoldReason ? "On Hold" : "Processing Facility",
+      description: order.onHoldReason || "Shipment on hold",
+      status: "onhold"
     });
   }
   
@@ -84,6 +96,8 @@ export const convertOrderToTrackingInfo = (order: AdminOrder): TrackingInfo => {
   let estimatedDelivery = "No estimation available";
   if (statusValue === "delivered") {
     estimatedDelivery = "Delivered";
+  } else if (statusValue === "onhold") {
+    estimatedDelivery = "On Hold - Pending Resolution";
   } else {
     const days = statusValue === "intransit" ? 1 : statusValue === "processing" ? 3 : 5;
     const estDate = new Date();
@@ -94,10 +108,13 @@ export const convertOrderToTrackingInfo = (order: AdminOrder): TrackingInfo => {
   // Generate events based on status
   const events = generateEventsFromStatus(order);
 
-  // Set a default shipment date (1 day after order creation)
-  const orderDate = new Date(order.createdAt);
-  const shipmentDate = new Date(orderDate);
-  shipmentDate.setDate(orderDate.getDate() + 1);
+  // Set shipment date from order or default (1 day after order creation)
+  const shipmentDate = order.shipmentDate || (() => {
+    const orderDate = new Date(order.createdAt);
+    const shipDate = new Date(orderDate);
+    shipDate.setDate(orderDate.getDate() + 1);
+    return format(shipDate, "yyyy-MM-dd");
+  })();
   
   // Create the tracking info object with recipient information
   return {
@@ -116,12 +133,15 @@ export const convertOrderToTrackingInfo = (order: AdminOrder): TrackingInfo => {
       available: true,
     },
     service: "APEX Express Shipping",
-    // Add recipient information (example values)
+    // Add recipient information from order or default values
     recipient: {
       name: order.recipientName || "John Doe",
       address: order.recipientAddress || "123 Delivery Street, Destination City"
     },
     // Add shipment date
-    shipmentDate: format(shipmentDate, "yyyy-MM-dd")
+    shipmentDate,
+    // Add on hold information if applicable
+    onHold: statusValue === "onhold",
+    onHoldReason: order.onHoldReason
   };
 };

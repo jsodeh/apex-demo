@@ -14,6 +14,7 @@ import {
   initializeLocalStorage,
   getAdminCredentials 
 } from "@/lib/local-storage";
+import { format } from "date-fns";
 
 const AdminPage = () => {
   const [orders, setOrders] = useState<AdminOrder[]>([]);
@@ -69,8 +70,26 @@ const AdminPage = () => {
   };
 
   const handleUpdateStatus = (trackingId: string, data: UpdateStatusFormData) => {
+    // Prepare the update object
+    const updates: Partial<AdminOrder> = { 
+      status: data.status 
+    };
+    
+    // Add shipment date if provided
+    if (data.shipmentDate) {
+      updates.shipmentDate = format(data.shipmentDate, "yyyy-MM-dd");
+    }
+    
+    // Add on hold reason if applicable
+    if (data.status === "onhold") {
+      updates.onHoldReason = data.onHoldReason || "No reason specified";
+    } else {
+      updates.onHoldReason = undefined;
+      updates.onHold = false;
+    }
+    
     // Update the order status in localStorage
-    const updatedOrders = updateOrder(trackingId, { status: data.status });
+    const updatedOrders = updateOrder(trackingId, updates);
     setOrders(updatedOrders);
     
     // Show success toast with information
