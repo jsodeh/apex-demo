@@ -28,5 +28,5 @@ export interface UpdateStatusFormData {
   location: string;
   description: string;
   onHoldReason?: string;
-  shipmentDate?: string;
+  shipmentDate?: Date;
 }

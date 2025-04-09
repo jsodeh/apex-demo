@@ -1,7 +1,7 @@
 
 import { Check, Circle } from "lucide-react";
 
-type TimelineStatus = "ordered" | "processing" | "intransit" | "delivered";
+type TimelineStatus = "ordered" | "processing" | "intransit" | "delivered" | "onhold";
 
 interface TimelineItemProps {
   label: string;
@@ -43,6 +43,8 @@ const TimelineItem = ({ label, active, completed, isLast = false }: TimelineItem
 };
 
 const TrackingTimeline = ({ currentStatus }: TrackingTimelineProps) => {
+  // We're specifically filtering out "onhold" from the timeline display
+  // as per requirements - it will be shown separately as a notice
   const steps = [
     { id: "ordered", label: "Order" },
     { id: "processing", label: "Processing" },
@@ -50,8 +52,12 @@ const TrackingTimeline = ({ currentStatus }: TrackingTimelineProps) => {
     { id: "delivered", label: "Delivered" }
   ];
 
+  // If status is "onhold", we'll show it at the "processing" stage
+  // since that's typically where an order would go on hold
+  const effectiveStatus = currentStatus === "onhold" ? "processing" : currentStatus;
+
   const getCurrentStatusIndex = () => {
-    return steps.findIndex(step => step.id === currentStatus);
+    return steps.findIndex(step => step.id === effectiveStatus);
   };
 
   const currentStatusIndex = getCurrentStatusIndex();
@@ -64,7 +70,7 @@ const TrackingTimeline = ({ currentStatus }: TrackingTimelineProps) => {
             <TimelineItem
               label={step.label}
               active={index === currentStatusIndex}
-              completed={index < currentStatusIndex || step.id === currentStatus && step.id === "delivered"}
+              completed={index < currentStatusIndex || step.id === effectiveStatus && step.id === "delivered"}
               isLast={index === steps.length - 1}
             />
           </div>

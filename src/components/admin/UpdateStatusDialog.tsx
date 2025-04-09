@@ -7,7 +7,6 @@ import { AdminOrder, UpdateStatusFormData } from "@/types/admin";
 import { TimelineStatus } from "@/types/tracking";
 import { toast } from "sonner";
 import { format } from "date-fns";
-import { CalendarIcon } from "lucide-react";
 
 import {
   Dialog,
@@ -40,7 +39,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import { Package, SendHorizontal, Calendar as CalendarIcon } from "lucide-react";
+import { Package, SendHorizontal, CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Textarea } from "@/components/ui/textarea";
 
@@ -223,7 +222,6 @@ const UpdateStatusDialog = ({
                         selected={field.value}
                         onSelect={field.onChange}
                         initialFocus
-                        className={cn("p-3 pointer-events-auto")}
                       />
                     </PopoverContent>
                   </Popover>

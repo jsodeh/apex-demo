@@ -83,6 +83,7 @@ const AdminPage = () => {
     // Add on hold reason if applicable
     if (data.status === "onhold") {
       updates.onHoldReason = data.onHoldReason || "No reason specified";
+      updates.onHold = true;
     } else {
       updates.onHoldReason = undefined;
       updates.onHold = false;
