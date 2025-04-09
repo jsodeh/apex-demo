@@ -93,7 +93,13 @@ export const convertOrderToTrackingInfo = (order: AdminOrder): TrackingInfo => {
   
   // Generate events based on status
   const events = generateEventsFromStatus(order);
+
+  // Set a default shipment date (1 day after order creation)
+  const orderDate = new Date(order.createdAt);
+  const shipmentDate = new Date(orderDate);
+  shipmentDate.setDate(orderDate.getDate() + 1);
   
+  // Create the tracking info object with recipient information
   return {
     trackingId: order.trackingId,
     status: {
@@ -109,6 +115,13 @@ export const convertOrderToTrackingInfo = (order: AdminOrder): TrackingInfo => {
       name: "APEX International Logistics",
       available: true,
     },
-    service: "APEX Express Shipping"
+    service: "APEX Express Shipping",
+    // Add recipient information (example values)
+    recipient: {
+      name: order.recipientName || "John Doe",
+      address: order.recipientAddress || "123 Delivery Street, Destination City"
+    },
+    // Add shipment date
+    shipmentDate: format(shipmentDate, "yyyy-MM-dd")
   };
 };

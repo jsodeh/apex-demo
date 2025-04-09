@@ -15,6 +15,11 @@ export interface TrackingEvent {
   status: string;
 }
 
+export interface Recipient {
+  name: string;
+  address: string;
+}
+
 export interface TrackingInfo {
   trackingId: string;
   status: TrackingStatus;
@@ -27,4 +32,6 @@ export interface TrackingInfo {
     available: boolean;
   };
   service: string;
+  recipient?: Recipient;
+  shipmentDate?: string;
 }

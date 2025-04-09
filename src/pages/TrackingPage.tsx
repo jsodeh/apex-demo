@@ -13,6 +13,7 @@ import TrackAnotherPackage from "@/components/tracking/TrackAnotherPackage";
 import LoadingState from "@/components/tracking/LoadingState";
 import NotFoundState from "@/components/tracking/NotFoundState";
 import { toast } from "sonner";
+import { Mail } from "lucide-react";
 
 const TrackingPage = () => {
   const { trackingId } = useParams<{ trackingId: string }>();
@@ -119,6 +120,8 @@ const TrackingPage = () => {
           destination={trackingInfo.destination}
           sender={trackingInfo.sender}
           service={trackingInfo.service}
+          recipient={trackingInfo.recipient}
+          shipmentDate={trackingInfo.shipmentDate}
         />
         
         <ServiceInformation />
@@ -126,6 +129,13 @@ const TrackingPage = () => {
         <TrackingEvents events={trackingInfo.events} />
         
         <TrackAnotherPackage onSubmit={handleTrackAnother} />
+
+        <div className="mt-8 p-4 bg-gray-50 rounded-lg border border-gray-200 text-center">
+          <div className="flex items-center justify-center gap-2 text-gray-600">
+            <Mail className="h-4 w-4" />
+            <p>For any complain contact us at AIL@AIL.COM</p>
+          </div>
+        </div>
       </div>
     </div>
   );
