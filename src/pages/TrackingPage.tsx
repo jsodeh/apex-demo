@@ -122,6 +122,8 @@ const TrackingPage = () => {
           service={trackingInfo.service}
           recipient={trackingInfo.recipient}
           shipmentDate={trackingInfo.shipmentDate}
+          onHold={trackingInfo.onHold}
+          onHoldReason={trackingInfo.onHoldReason}
         />
         
         <ServiceInformation />

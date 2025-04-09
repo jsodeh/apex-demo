@@ -1,7 +1,7 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import TrackingTimeline from "@/components/TrackingTimeline";
-import { Calendar, Edit } from "lucide-react";
+import { Calendar, Edit, AlertCircle } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -9,9 +9,11 @@ import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { TimelineStatus } from "@/types/tracking";
 
 interface TrackingStatus {
-  status: "ordered" | "processing" | "intransit" | "delivered";
+  status: TimelineStatus;
   label: string;
   date: string;
 }
@@ -33,6 +35,8 @@ interface ShipmentStatusCardProps {
   service: string;
   recipient?: Recipient;
   shipmentDate?: string;
+  onHold?: boolean;
+  onHoldReason?: string;
 }
 
 const ShipmentStatusCard = ({
@@ -43,7 +47,9 @@ const ShipmentStatusCard = ({
   sender,
   service,
   recipient,
-  shipmentDate
+  shipmentDate,
+  onHold,
+  onHoldReason
 }: ShipmentStatusCardProps) => {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(
     shipmentDate ? new Date(shipmentDate) : undefined
@@ -67,6 +73,16 @@ const ShipmentStatusCard = ({
             <p className="text-gray-600 mb-4">
               {status.date}
             </p>
+            
+            {onHold && (
+              <Alert variant="warning" className="mb-4 bg-yellow-50 text-yellow-800 border-yellow-300">
+                <AlertCircle className="h-4 w-4" />
+                <AlertTitle>Shipment On Hold</AlertTitle>
+                <AlertDescription>
+                  {onHoldReason || "This shipment is currently on hold. Please contact customer service for more information."}
+                </AlertDescription>
+              </Alert>
+            )}
             
             <TrackingTimeline currentStatus={status.status} />
             
@@ -94,7 +110,6 @@ const ShipmentStatusCard = ({
                         selected={selectedDate}
                         onSelect={handleDateChange}
                         initialFocus
-                        className={cn("p-3 pointer-events-auto")}
                       />
                     </PopoverContent>
                   </Popover>

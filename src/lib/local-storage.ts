@@ -27,9 +27,34 @@ export interface AdminCredential {
 export const getStoredOrders = (): AdminOrder[] => {
   try {
     const ordersJson = localStorage.getItem(ORDERS_STORAGE_KEY);
-    return ordersJson ? JSON.parse(ordersJson) : [];
+    
+    // If no orders exist yet, generate some mock data
+    if (!ordersJson) {
+      // Import mock data generator and create initial data
+      return initializeOrderData();
+    }
+    
+    return JSON.parse(ordersJson);
   } catch (error) {
     console.error("Error loading orders from localStorage:", error);
+    return [];
+  }
+};
+
+// Initialize order data if none exists
+const initializeOrderData = (): AdminOrder[] => {
+  try {
+    // Import mock generator directly to avoid circular import issues
+    const { generateMockOrders } = require('./mock-admin');
+    const mockOrders = generateMockOrders(5);
+    
+    // Save to localStorage
+    localStorage.setItem(ORDERS_STORAGE_KEY, JSON.stringify(mockOrders));
+    console.log("Initialized sample order data in localStorage");
+    
+    return mockOrders;
+  } catch (error) {
+    console.error("Error initializing order data:", error);
     return [];
   }
 };
@@ -110,16 +135,7 @@ export const saveAdminCredentials = (credentials: AdminCredential): void => {
 export const initializeLocalStorage = (): void => {
   // Check if orders exist, if not create sample data
   const existingOrders = getStoredOrders();
-  if (existingOrders.length === 0) {
-    // We'll use the mock data generation for initial data
-    // But save it to localStorage for persistence
-    import("./mock-admin").then(({ generateMockOrders }) => {
-      const mockOrders = generateMockOrders(5);
-      saveOrders(mockOrders);
-      console.log("Initialized sample order data in localStorage");
-    });
-  }
-
+  
   // Check if users exist, if not create sample data
   const existingUsers = getStoredUsers();
   if (existingUsers.length === 0) {
