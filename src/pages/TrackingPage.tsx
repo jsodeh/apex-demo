@@ -34,6 +34,14 @@ const TrackingPage = () => {
     console.log(`Searching for tracking ID: ${normalizedTrackingId}`);
     console.log(`Available orders:`, orders.map(o => o.trackingId));
     
+    // Log detailed information about each tracking ID for debugging
+    orders.forEach(order => {
+      console.log(`Order tracking ID: "${order.trackingId}" (${typeof order.trackingId}), length: ${order.trackingId.length}`);
+      console.log(`Normalized: "${order.trackingId.trim().toUpperCase()}", length: ${order.trackingId.trim().toUpperCase().length}`);
+      console.log(`Comparison result:`, order.trackingId.trim().toUpperCase() === normalizedTrackingId);
+    });
+    console.log(`Input tracking ID: "${normalizedTrackingId}" (${typeof normalizedTrackingId}), length: ${normalizedTrackingId.length}`);
+    
     // Find the order with matching tracking ID (case-insensitive)
     const order = orders.find(o => 
       o.trackingId.trim().toUpperCase() === normalizedTrackingId
