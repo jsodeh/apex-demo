@@ -45,6 +45,7 @@ export const getStoredOrders = (): AdminOrder[] => {
 const initializeOrderData = (): AdminOrder[] => {
   try {
     // Import mock generator directly to avoid circular import issues
+    // Using require syntax here to avoid circular dependencies
     const { generateMockOrders } = require('./mock-admin');
     const mockOrders = generateMockOrders(5);
     
@@ -79,9 +80,15 @@ export const addOrder = (newOrder: AdminOrder): AdminOrder[] => {
 // Update an existing order
 export const updateOrder = (trackingId: string, updates: Partial<AdminOrder>): AdminOrder[] => {
   const currentOrders = getStoredOrders();
-  const updatedOrders = currentOrders.map(order => 
-    order.trackingId === trackingId ? { ...order, ...updates } : order
-  );
+  
+  // Normalize the trackingId for comparison (to match our tracking page logic)
+  const normalizedTrackingId = trackingId.trim().toUpperCase();
+  
+  const updatedOrders = currentOrders.map(order => {
+    const orderTrackingId = order.trackingId.trim().toUpperCase();
+    return orderTrackingId === normalizedTrackingId ? { ...order, ...updates } : order;
+  });
+  
   saveOrders(updatedOrders);
   return updatedOrders;
 };
@@ -133,6 +140,10 @@ export const saveAdminCredentials = (credentials: AdminCredential): void => {
 
 // Initialize with default data if storage is empty
 export const initializeLocalStorage = (): void => {
+  // Clear localStorage to ensure fresh data during development
+  // This helps prevent stale data issues
+  localStorage.removeItem(ORDERS_STORAGE_KEY);
+  
   // Check if orders exist, if not create sample data
   const existingOrders = getStoredOrders();
   

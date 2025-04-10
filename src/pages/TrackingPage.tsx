@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { TrackingInfo } from "@/types/tracking";
@@ -26,27 +25,21 @@ const TrackingPage = () => {
     if (!trackingId) return;
     
     setIsLoading(true);
+    
     // Get data from localStorage
     const orders = getStoredOrders();
     
-    // Normalize the trackingId for comparison (trim and convert to uppercase)
+    // IMPROVED MATCHING: Normalize the trackingId for comparison (trim and convert to uppercase)
     const normalizedTrackingId = trackingId.trim().toUpperCase();
     
     console.log(`Searching for tracking ID: ${normalizedTrackingId}`);
     console.log(`Available orders:`, orders.map(o => o.trackingId));
     
-    // Log detailed information about each tracking ID for debugging
-    orders.forEach(order => {
-      console.log(`Order tracking ID: "${order.trackingId}" (${typeof order.trackingId}), length: ${order.trackingId.length}`);
-      console.log(`Normalized: "${order.trackingId.trim().toUpperCase()}", length: ${order.trackingId.trim().toUpperCase().length}`);
-      console.log(`Comparison result:`, order.trackingId.trim().toUpperCase() === normalizedTrackingId);
+    // Find order using a simpler matching approach
+    const order = orders.find(o => {
+      const orderTrackingId = o.trackingId.trim().toUpperCase();
+      return orderTrackingId === normalizedTrackingId;
     });
-    console.log(`Input tracking ID: "${normalizedTrackingId}" (${typeof normalizedTrackingId}), length: ${normalizedTrackingId.length}`);
-    
-    // Find the order with matching tracking ID (case-insensitive)
-    const order = orders.find(o => 
-      o.trackingId.trim().toUpperCase() === normalizedTrackingId
-    );
     
     if (order) {
       // Convert admin order to tracking info format
@@ -54,9 +47,12 @@ const TrackingPage = () => {
       setTrackingInfo(data);
       console.log("Found tracking information:", data);
     } else {
+      // Add more details about why the search failed
       console.log(`No order found with tracking ID: ${normalizedTrackingId}`);
+      console.log("Available tracking IDs:", orders.map(o => o.trackingId));
       setTrackingInfo(null);
     }
+    
     setIsLoading(false);
   };
   

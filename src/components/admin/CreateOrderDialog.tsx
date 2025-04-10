@@ -26,6 +26,7 @@ const CreateOrderDialog = ({ open, onClose, onCreateOrder }: CreateOrderDialogPr
     origin: "",
     destination: "",
     service: "express",
+    recipientName: "", // Added for recipient name
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -49,6 +50,7 @@ const CreateOrderDialog = ({ open, onClose, onCreateOrder }: CreateOrderDialogPr
       status: "ordered",
       origin: formData.origin,
       destination: formData.destination,
+      recipientName: formData.recipientName, // Add recipient name to the order
     };
     
     onCreateOrder(newOrder);
@@ -59,6 +61,7 @@ const CreateOrderDialog = ({ open, onClose, onCreateOrder }: CreateOrderDialogPr
       origin: "",
       destination: "",
       service: "express",
+      recipientName: "", // Reset recipient name
     });
   };
 
@@ -93,6 +96,19 @@ const CreateOrderDialog = ({ open, onClose, onCreateOrder }: CreateOrderDialogPr
                 name="customerName"
                 placeholder="Enter customer name"
                 value={formData.customerName}
+                onChange={handleChange}
+                required
+              />
+            </div>
+
+            {/* Added Recipient Name field */}
+            <div className="grid gap-2">
+              <Label htmlFor="recipientName">Recipient Name</Label>
+              <Input
+                id="recipientName"
+                name="recipientName"
+                placeholder="Enter recipient name"
+                value={formData.recipientName}
                 onChange={handleChange}
                 required
               />

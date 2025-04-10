@@ -21,6 +21,7 @@ export interface CreateOrderFormData {
   origin: string;
   destination: string;
   service: string;
+  recipientName: string; // Added recipientName field
 }
 
 export interface UpdateStatusFormData {
