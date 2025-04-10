@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { TrackingInfo } from "@/types/tracking";
-import { findOrderByTrackingId, getStoredOrders } from "@/lib/local-storage";
+import { findOrderByTrackingId, getStoredOrders } from "@/lib/storage";
 import { convertOrderToTrackingInfo } from "@/lib/tracking-utils";
 
 import TrackingHeader from "@/components/tracking/TrackingHeader";

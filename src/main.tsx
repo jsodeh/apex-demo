@@ -3,7 +3,7 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App.tsx';
 import './index.css';
-import { initializeLocalStorage } from './lib/local-storage';
+import { initializeLocalStorage } from './lib/storage';
 
 // Initialize local storage with default data if needed
 initializeLocalStorage();

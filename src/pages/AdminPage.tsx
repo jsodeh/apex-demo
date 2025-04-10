@@ -13,7 +13,7 @@ import {
   updateOrder, 
   initializeLocalStorage,
   getAdminCredentials 
-} from "@/lib/local-storage";
+} from "@/lib/storage";
 import { format } from "date-fns";
 
 const AdminPage = () => {

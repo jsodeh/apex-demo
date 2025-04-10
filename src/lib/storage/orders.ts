@@ -1,32 +1,7 @@
 
 import { AdminOrder } from "@/types/admin";
-
-// Local storage keys
-const ORDERS_STORAGE_KEY = "apex_orders";
-const USERS_STORAGE_KEY = "apex_users";
-const ADMIN_CREDENTIALS_KEY = "apex_admin_credentials";
-
-// Type for user details
-export interface UserDetails {
-  id: string;
-  name: string;
-  email: string;
-  role: "admin" | "user";
-  createdAt: string;
-}
-
-// Type for admin credentials
-export interface AdminCredential {
-  username: string;
-  password: string;
-  name: string;
-  email: string;
-}
-
-// Utility function to normalize tracking IDs for comparison
-export const normalizeTrackingId = (trackingId: string): string => {
-  return trackingId.trim().toUpperCase();
-};
+import { ORDERS_STORAGE_KEY } from "./constants";
+import { normalizeTrackingId } from "./utils";
 
 // Get all orders from localStorage
 export const getStoredOrders = (): AdminOrder[] => {
@@ -77,7 +52,7 @@ const initializeOrderData = (): AdminOrder[] => {
   try {
     // Import mock generator directly to avoid circular import issues
     // Using require syntax here to avoid circular dependencies
-    const { generateMockOrders } = require('./mock-admin');
+    const { generateMockOrders } = require('../mock-admin');
     const mockOrders = generateMockOrders(5);
     
     // Make sure the order from the screenshot is included
@@ -143,97 +118,3 @@ export const updateOrder = (trackingId: string, updates: Partial<AdminOrder>): A
   saveOrders(updatedOrders);
   return updatedOrders;
 };
-
-// User related functions
-export const getStoredUsers = (): UserDetails[] => {
-  try {
-    const usersJson = localStorage.getItem(USERS_STORAGE_KEY);
-    return usersJson ? JSON.parse(usersJson) : [];
-  } catch (error) {
-    console.error("Error loading users from localStorage:", error);
-    return [];
-  }
-};
-
-export const saveUsers = (users: UserDetails[]): void => {
-  try {
-    localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
-  } catch (error) {
-    console.error("Error saving users to localStorage:", error);
-  }
-};
-
-export const addUser = (newUser: UserDetails): UserDetails[] => {
-  const currentUsers = getStoredUsers();
-  const updatedUsers = [newUser, ...currentUsers];
-  saveUsers(updatedUsers);
-  return updatedUsers;
-};
-
-// Admin credentials functions
-export const getAdminCredentials = (): AdminCredential | null => {
-  try {
-    const credentialsJson = localStorage.getItem(ADMIN_CREDENTIALS_KEY);
-    return credentialsJson ? JSON.parse(credentialsJson) : null;
-  } catch (error) {
-    console.error("Error loading admin credentials from localStorage:", error);
-    return null;
-  }
-};
-
-export const saveAdminCredentials = (credentials: AdminCredential): void => {
-  try {
-    localStorage.setItem(ADMIN_CREDENTIALS_KEY, JSON.stringify(credentials));
-  } catch (error) {
-    console.error("Error saving admin credentials to localStorage:", error);
-  }
-};
-
-// Initialize with default data if storage is empty
-export const initializeLocalStorage = (): void => {
-  // Get existing orders, don't clear them unnecessarily
-  // This ensures persistence between page refreshes
-  const existingOrdersJson = localStorage.getItem(ORDERS_STORAGE_KEY);
-  if (!existingOrdersJson) {
-    // Only initialize if no orders exist
-    const mockOrders = initializeOrderData();
-    console.log("Initialized orders:", mockOrders.length);
-  }
-  
-  // Check if users exist, if not create sample data
-  const existingUsers = getStoredUsers();
-  if (existingUsers.length === 0) {
-    const defaultUsers: UserDetails[] = [
-      {
-        id: "user1",
-        name: "Admin User",
-        email: "admin@apexshipping.com",
-        role: "admin",
-        createdAt: new Date().toISOString()
-      },
-      {
-        id: "user2",
-        name: "Regular User",
-        email: "user@example.com",
-        role: "user",
-        createdAt: new Date().toISOString()
-      }
-    ];
-    saveUsers(defaultUsers);
-    console.log("Initialized sample user data in localStorage");
-  }
-  
-  // Check if admin credentials exist, if not create them
-  const existingCredentials = getAdminCredentials();
-  if (!existingCredentials) {
-    const adminCredentials: AdminCredential = {
-      username: "admin",
-      password: "apex2025",
-      name: "Admin User",
-      email: "admin@apexshipping.com"
-    };
-    saveAdminCredentials(adminCredentials);
-    console.log("Initialized admin credentials in localStorage");
-  }
-};
-
