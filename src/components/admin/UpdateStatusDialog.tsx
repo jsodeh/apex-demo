@@ -2,11 +2,10 @@
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
 import { AdminOrder, UpdateStatusFormData } from "@/types/admin";
 import { TimelineStatus } from "@/types/tracking";
 import { toast } from "sonner";
-import { format } from "date-fns";
+import { Package } from "lucide-react";
 
 import {
   Dialog,
@@ -14,48 +13,10 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
-  DialogFooter,
 } from "@/components/ui/dialog";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
-import { Package, SendHorizontal, CalendarIcon } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { Textarea } from "@/components/ui/textarea";
 
-const formSchema = z.object({
-  status: z.enum(["ordered", "processing", "intransit", "delivered", "onhold"], {
-    required_error: "Please select a status",
-  }),
-  location: z.string().min(2, {
-    message: "Location must be at least 2 characters",
-  }),
-  description: z.string().min(5, {
-    message: "Description must be at least 5 characters",
-  }),
-  onHoldReason: z.string().optional(),
-  shipmentDate: z.date().optional(),
-});
+import UpdateStatusForm from "./update-status/UpdateStatusForm";
+import { updateStatusFormSchema, UpdateStatusFormSchema } from "./schemas/update-status-schema";
 
 interface UpdateStatusDialogProps {
   order: AdminOrder | null;
@@ -72,8 +33,8 @@ const UpdateStatusDialog = ({
 }: UpdateStatusDialogProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const form = useForm<UpdateStatusFormData>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<UpdateStatusFormSchema>({
+    resolver: zodResolver(updateStatusFormSchema),
     defaultValues: {
       status: (order?.status as TimelineStatus) || "processing",
       location: "",
@@ -99,7 +60,7 @@ const UpdateStatusDialog = ({
     }
   }, [order, form]);
 
-  const onSubmit = (data: UpdateStatusFormData) => {
+  const onSubmit = (data: UpdateStatusFormSchema) => {
     if (!order) {
       toast.error("No order selected");
       return;
@@ -108,7 +69,7 @@ const UpdateStatusDialog = ({
     setIsSubmitting(true);
     
     try {
-      onUpdateStatus(order.trackingId, data);
+      onUpdateStatus(order.trackingId, data as UpdateStatusFormData);
       
       toast.success("Status updated successfully", {
         description: `${order.trackingId} is now ${data.status}`,
@@ -140,143 +101,13 @@ const UpdateStatusDialog = ({
           </DialogDescription>
         </DialogHeader>
 
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="status"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Shipment Status</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                    value={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select status" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="ordered">Ordered</SelectItem>
-                      <SelectItem value="processing">Processing</SelectItem>
-                      <SelectItem value="intransit">In Transit</SelectItem>
-                      <SelectItem value="delivered">Delivered</SelectItem>
-                      <SelectItem value="onhold">On Hold</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            
-            {isOnHold && (
-              <FormField
-                control={form.control}
-                name="onHoldReason"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>On Hold Reason</FormLabel>
-                    <FormControl>
-                      <Textarea 
-                        placeholder="Explain why the shipment is on hold..." 
-                        className="resize-none"
-                        {...field} 
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            )}
-            
-            <FormField
-              control={form.control}
-              name="shipmentDate"
-              render={({ field }) => (
-                <FormItem className="flex flex-col">
-                  <FormLabel>Shipment Date</FormLabel>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button
-                          variant={"outline"}
-                          className={cn(
-                            "w-full pl-3 text-left font-normal",
-                            !field.value && "text-muted-foreground"
-                          )}
-                        >
-                          {field.value ? (
-                            format(field.value, "PPP")
-                          ) : (
-                            <span>Pick a date</span>
-                          )}
-                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={field.value}
-                        onSelect={field.onChange}
-                        initialFocus
-                      />
-                    </PopoverContent>
-                  </Popover>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            
-            <FormField
-              control={form.control}
-              name="location"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Location</FormLabel>
-                  <FormControl>
-                    <Input placeholder="e.g. New York, NY" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Update Description</FormLabel>
-                  <FormControl>
-                    <Input placeholder="e.g. Package arrived at local facility" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <DialogFooter className="pt-4">
-              <Button 
-                variant="outline" 
-                onClick={onClose}
-                type="button"
-              >
-                Cancel
-              </Button>
-              <Button 
-                type="submit"
-                disabled={isSubmitting}
-                className="gap-2"
-              >
-                <SendHorizontal className="h-4 w-4" />
-                {isSubmitting ? "Updating..." : "Send Update"}
-              </Button>
-            </DialogFooter>
-          </form>
-        </Form>
+        <UpdateStatusForm
+          form={form}
+          isSubmitting={isSubmitting}
+          onSubmit={onSubmit}
+          onClose={onClose}
+          isOnHold={isOnHold}
+        />
       </DialogContent>
     </Dialog>
   );
