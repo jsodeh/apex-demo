@@ -1,7 +1,8 @@
+
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { TrackingInfo } from "@/types/tracking";
-import { getStoredOrders } from "@/lib/local-storage";
+import { findOrderByTrackingId, getStoredOrders } from "@/lib/local-storage";
 import { convertOrderToTrackingInfo } from "@/lib/tracking-utils";
 
 import TrackingHeader from "@/components/tracking/TrackingHeader";
@@ -26,20 +27,8 @@ const TrackingPage = () => {
     
     setIsLoading(true);
     
-    // Get data from localStorage
-    const orders = getStoredOrders();
-    
-    // IMPROVED MATCHING: Normalize the trackingId for comparison (trim and convert to uppercase)
-    const normalizedTrackingId = trackingId.trim().toUpperCase();
-    
-    console.log(`Searching for tracking ID: ${normalizedTrackingId}`);
-    console.log(`Available orders:`, orders.map(o => o.trackingId));
-    
-    // Find order using a simpler matching approach
-    const order = orders.find(o => {
-      const orderTrackingId = o.trackingId.trim().toUpperCase();
-      return orderTrackingId === normalizedTrackingId;
-    });
+    // Use the improved findOrderByTrackingId function
+    const order = findOrderByTrackingId(trackingId);
     
     if (order) {
       // Convert admin order to tracking info format
@@ -48,7 +37,9 @@ const TrackingPage = () => {
       console.log("Found tracking information:", data);
     } else {
       // Add more details about why the search failed
-      console.log(`No order found with tracking ID: ${normalizedTrackingId}`);
+      console.log(`No order found with tracking ID: ${trackingId}`);
+      // Get available tracking IDs for debugging
+      const orders = getStoredOrders();
       console.log("Available tracking IDs:", orders.map(o => o.trackingId));
       setTrackingInfo(null);
     }
@@ -73,15 +64,8 @@ const TrackingPage = () => {
   }, [trackingId, navigate]);
   
   const handleTrackAnother = (id: string) => {
-    // Normalize tracking IDs for comparison
-    if (id.trim().toUpperCase() === trackingId?.trim().toUpperCase()) {
-      // If trying to track the same ID, refresh the data
-      toast.info("Refreshing tracking information");
-      fetchTrackingData();
-    } else {
-      // Otherwise navigate to the new tracking page
-      navigate(`/tracking/${id}`);
-    }
+    // Navigate to the new tracking page
+    navigate(`/tracking/${id}`);
   };
 
   if (isLoading) {

@@ -1,4 +1,3 @@
-
 import { AdminOrder } from "@/types/admin";
 import { generateMockTrackingData } from "./mock-data";
 
@@ -41,33 +40,8 @@ export const generateMockOrders = (count = 10): AdminOrder[] => {
     });
   }
   
-  // Add specific test orders for tracking
-  
-  // The problematic tracking ID the user reported
-  orders.push({
-    id: "order-test-tracking-1",
-    trackingId: "APX641275743", // Exact tracking ID from the screenshot
-    customerName: "Jennifer Taylor",
-    createdAt: new Date().toISOString(),
-    status: "ordered",
-    origin: "San Antonio, TX",
-    destination: "New York, NY",
-    recipientName: "Robert Smith",
-    recipientAddress: "456 Broadway, New York, NY, 10001",
-  });
-  
-  // The order from the previous example
-  orders.push({
-    id: "order-test-2",
-    trackingId: "APX272265415",
-    customerName: "Elizabeth Thomas",
-    createdAt: new Date().toISOString(),
-    status: "delivered",
-    origin: "London, UK",
-    destination: "New York, NY",
-    recipientName: "Robert Smith",
-    recipientAddress: "456 Broadway, New York, NY, 10001",
-  });
+  // No more hardcoded test orders - we'll rely on the improved matching system
+  // and orders created by admins in the system
   
   // Sort orders by creation date (newest first)
   return orders.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());

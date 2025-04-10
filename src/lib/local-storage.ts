@@ -23,6 +23,11 @@ export interface AdminCredential {
   email: string;
 }
 
+// Utility function to normalize tracking IDs for comparison
+export const normalizeTrackingId = (trackingId: string): string => {
+  return trackingId.trim().toUpperCase();
+};
+
 // Get all orders from localStorage
 export const getStoredOrders = (): AdminOrder[] => {
   try {
@@ -39,6 +44,20 @@ export const getStoredOrders = (): AdminOrder[] => {
     console.error("Error loading orders from localStorage:", error);
     return [];
   }
+};
+
+// Find an order by tracking ID - case insensitive and trimmed
+export const findOrderByTrackingId = (trackingId: string): AdminOrder | undefined => {
+  if (!trackingId) return undefined;
+  
+  const normalizedSearchId = normalizeTrackingId(trackingId);
+  const orders = getStoredOrders();
+  
+  // Find order with normalized comparison
+  return orders.find(order => {
+    const normalizedOrderId = normalizeTrackingId(order.trackingId);
+    return normalizedOrderId === normalizedSearchId;
+  });
 };
 
 // Initialize order data if none exists
@@ -81,11 +100,11 @@ export const addOrder = (newOrder: AdminOrder): AdminOrder[] => {
 export const updateOrder = (trackingId: string, updates: Partial<AdminOrder>): AdminOrder[] => {
   const currentOrders = getStoredOrders();
   
-  // Normalize the trackingId for comparison (to match our tracking page logic)
-  const normalizedTrackingId = trackingId.trim().toUpperCase();
+  // Use the normalize function for comparison
+  const normalizedTrackingId = normalizeTrackingId(trackingId);
   
   const updatedOrders = currentOrders.map(order => {
-    const orderTrackingId = order.trackingId.trim().toUpperCase();
+    const orderTrackingId = normalizeTrackingId(order.trackingId);
     return orderTrackingId === normalizedTrackingId ? { ...order, ...updates } : order;
   });
   
@@ -140,12 +159,14 @@ export const saveAdminCredentials = (credentials: AdminCredential): void => {
 
 // Initialize with default data if storage is empty
 export const initializeLocalStorage = (): void => {
-  // Clear localStorage to ensure fresh data during development
-  // This helps prevent stale data issues
-  localStorage.removeItem(ORDERS_STORAGE_KEY);
-  
-  // Check if orders exist, if not create sample data
-  const existingOrders = getStoredOrders();
+  // Get existing orders, don't clear them unnecessarily
+  // This ensures persistence between page refreshes
+  const existingOrdersJson = localStorage.getItem(ORDERS_STORAGE_KEY);
+  if (!existingOrdersJson) {
+    // Only initialize if no orders exist
+    const mockOrders = initializeOrderData();
+    console.log("Initialized orders:", mockOrders.length);
+  }
   
   // Check if users exist, if not create sample data
   const existingUsers = getStoredUsers();
