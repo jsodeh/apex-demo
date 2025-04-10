@@ -20,31 +20,42 @@ const TrackingPage = () => {
   const navigate = useNavigate();
   const [trackingInfo, setTrackingInfo] = useState<TrackingInfo | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
   
   // Function to fetch the latest tracking data
   const fetchTrackingData = () => {
     if (!trackingId) return;
     
     setIsLoading(true);
+    setNotFound(false);
     
-    // Use the improved findOrderByTrackingId function
-    const order = findOrderByTrackingId(trackingId);
-    
-    if (order) {
-      // Convert admin order to tracking info format
-      const data = convertOrderToTrackingInfo(order);
-      setTrackingInfo(data);
-      console.log("Found tracking information:", data);
-    } else {
-      // Add more details about why the search failed
-      console.log(`No order found with tracking ID: ${trackingId}`);
-      // Get available tracking IDs for debugging
-      const orders = getStoredOrders();
-      console.log("Available tracking IDs:", orders.map(o => o.trackingId));
+    try {
+      // Use the improved findOrderByTrackingId function
+      const order = findOrderByTrackingId(trackingId);
+      
+      if (order) {
+        // Convert admin order to tracking info format
+        const data = convertOrderToTrackingInfo(order);
+        setTrackingInfo(data);
+        console.log("Found tracking information:", data);
+        setNotFound(false);
+      } else {
+        // Add more details about why the search failed
+        console.log(`No order found with tracking ID: ${trackingId}`);
+        // Get available tracking IDs for debugging
+        const orders = getStoredOrders();
+        console.log("Available tracking IDs:", orders.map(o => o.trackingId));
+        setTrackingInfo(null);
+        setNotFound(true);
+      }
+    } catch (error) {
+      console.error("Error fetching tracking data:", error);
+      toast.error("Failed to load tracking information");
       setTrackingInfo(null);
+      setNotFound(true);
+    } finally {
+      setIsLoading(false);
     }
-    
-    setIsLoading(false);
   };
   
   useEffect(() => {
@@ -78,7 +89,7 @@ const TrackingPage = () => {
     );
   }
   
-  if (!trackingInfo) {
+  if (notFound || !trackingInfo) {
     return (
       <div className="container py-12">
         <div className="max-w-3xl mx-auto">

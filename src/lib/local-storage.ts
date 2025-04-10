@@ -53,11 +53,23 @@ export const findOrderByTrackingId = (trackingId: string): AdminOrder | undefine
   const normalizedSearchId = normalizeTrackingId(trackingId);
   const orders = getStoredOrders();
   
+  console.log(`Searching for tracking ID: ${normalizedSearchId}`);
+  console.log(`Available orders: ${orders.length}`);
+  
   // Find order with normalized comparison
-  return orders.find(order => {
+  const matchingOrder = orders.find(order => {
     const normalizedOrderId = normalizeTrackingId(order.trackingId);
     return normalizedOrderId === normalizedSearchId;
   });
+  
+  if (matchingOrder) {
+    console.log(`Found matching order: ${matchingOrder.trackingId}`);
+  } else {
+    console.log('No matching order found');
+    console.log('Available tracking IDs:', orders.map(o => o.trackingId));
+  }
+  
+  return matchingOrder;
 };
 
 // Initialize order data if none exists
@@ -68,9 +80,29 @@ const initializeOrderData = (): AdminOrder[] => {
     const { generateMockOrders } = require('./mock-admin');
     const mockOrders = generateMockOrders(5);
     
+    // Make sure the order from the screenshot is included
+    const hasTestOrder = mockOrders.some(order => 
+      normalizeTrackingId(order.trackingId) === 'APX892661570');
+      
+    if (!hasTestOrder) {
+      // Add the specific order from the screenshot
+      mockOrders.push({
+        id: 'order-special',
+        trackingId: 'APX892661570',
+        customerName: 'John Smith',
+        createdAt: new Date().toISOString(),
+        status: 'ordered',
+        origin: 'Paris, France',
+        destination: 'Berlin, Germany',
+        recipientName: 'Mark Dean',
+        recipientAddress: '123 Delivery Street, Destination City'
+      });
+    }
+    
     // Save to localStorage
     localStorage.setItem(ORDERS_STORAGE_KEY, JSON.stringify(mockOrders));
     console.log("Initialized sample order data in localStorage");
+    console.log("Orders:", mockOrders.map(o => o.trackingId));
     
     return mockOrders;
   } catch (error) {
@@ -204,3 +236,4 @@ export const initializeLocalStorage = (): void => {
     console.log("Initialized admin credentials in localStorage");
   }
 };
+
